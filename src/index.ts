@@ -81,6 +81,7 @@ const executeScraping = (
 ): void => {
   const completed = 0;
   const collectedData: unknown[] = [];
+  const allCollectedData: unknown[] = []; // <-- Add this line to store all scraped data
 
   const total = urls.length;
 
@@ -90,6 +91,7 @@ const executeScraping = (
       async (url, index) => {
         const data = await getScrapedData(url, total, scrapeCallback);
         collectedData.push(data);
+        allCollectedData.push(data); // <-- Add this line to collect the data into the allCollectedData array
 
         if (collectedData.length >= 5 || index === urls.length - 1) {
           dataHandlingCallback(collectedData);
@@ -104,8 +106,8 @@ const executeScraping = (
       console.log(chalk.green('All requests have been made'));
       if (collectedData.length > 0) {
         dataHandlingCallback(collectedData);
-        onComplete(collectedData);
       }
+      onComplete(allCollectedData); // <-- Pass allCollectedData to the onComplete callback
     });
 };
 
