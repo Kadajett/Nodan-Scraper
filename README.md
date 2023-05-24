@@ -1,77 +1,168 @@
-# Nodan Scraper
+# Scraper Library
 
-The scraper for the modern web.
-
-Nodan Scraper is a highly flexible, efficient, and easy-to-use web scraping library built for Node.js. With its configurable concurrency support and callback-based design, Nodan Scraper lets you extract data from websites with control and precision.
-
-## Features
-
-- **Easy to use:** With just a few lines of code, you can start scraping websites.
-- **Flexible:** Bring your own scraping and data handling functions.
-- **Efficient:** Adjustable concurrency for faster data gathering.
-- **Progress updates:** Get real-time updates on the scraping progress.
-- **Error handling:** Easily handle and debug errors.
+A flexible and powerful library for web scraping.
 
 ## Installation
 
-```bash
-npm install nodan-scraper
+Install the package using npm: 
+`npm install nodan-scraper`
+
+## Usage
+
+### Importing the Library
+
+You can import the library into your project using the following import statements:
+
+```javascript
+// Importing the class variant
+import Scraper from 'nodan-scraper';
+
+// Importing the manual function call
+import { performScraping, CustomLogger } from 'nodan-scraper';
 ```
 
-Basic Usage
-Here's a basic example of how to use Nodan Scraper.
+Using the Class Variant
+The class variant allows you to perform web scraping by creating an instance of the Scraper class and configuring it with the required callbacks.
 
-```js
-import fs from "fs";
-import { executeScraping } from "nodan-scraper";
+```javascript
+// Create an instance of the Scraper class
+const scraper = new Scraper();
 
-const output = [];
+// Set the URLs to be scraped
+scraper.setUrls(['https://example.com/page1', 'https://example.com/page2']);
 
-executeScraping(
-  [
-    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=Champion%20of%20Anarchy",
-    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=Champion%20of%20Balance",
-    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=Champion%20of%20Freedom",
-    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=Champion%20of%20Destruction",
-    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=Champion%20of%20Grace",
-    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=Champion%20of%20Malevolence",
-    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=Champion%20of%20Righteousness",
-    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=Champion%20of%20Tranquility",
-    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=Champion%20of%20Tyranny",
-    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=All%20Gnolls%20Must%20Die",
-  ],
-  ($) => {
-    const links = [];
-    $("a").each((i, link) => {
-      const href = $(link).attr("href");
-      if (href && href !== "javascript:void(0);") {
-        links.push(href);
-      }
-    });
-    return links;
-  },
-  (data) => {
-    // Flatten the arrays and then print the length
-    const flattenedData = [].concat(...data);
+// Set the scrape callback function
+scraper.setScrapeCallback(($) => {
+  // Perform scraping logic and return the scraped data
+});
 
-    return flattenedData;
-  },
-  (data) => {
-    // flatten and then remove duplicates
-    const flattenedData = [].concat(...data);
-    fs.writeFileSync("output.json", JSON.stringify(flattenedData, null, 2));
-  }
-);
+// Set the data handling callback function
+scraper.setDataHandlingCallback((data) => {
+  // Perform data handling and return the processed data
+});
 
+// Set the concurrency (optional, default is 5)
+scraper.setConcurrency(10);
+
+// Set the onComplete callback function
+scraper.setOnComplete((data) => {
+  // Handle the scraped data after completion
+});
+
+// Execute the scraping process
+scraper.executeScraping()
+  .then(() => {
+    console.log('Scraping completed!');
+  })
+  .catch((error) => {
+    console.error('Error occurred during scraping:', error);
+  });
 ```
-API
-executeScraping(urls, scrapeCallback, dataHandlingCallback, [concurrency])
-urls (string[]): The URLs to scrape.
-scrapeCallback (Function): The function to scrape data from each page. This function is given a Cheerio instance and should return the scraped data.
-dataHandlingCallback (Function): The function to handle the scraped data. This function is called each time the number of scraped data reaches the concurrency limit or all URLs have been scraped.
-concurrency (number, optional): The number of simultaneous requests. Default is 5.
-Contributing
-We appreciate all contributions. Please feel free to fork and submit pull requests, or open issues to suggest changes or report bugs.
 
-License
-MIT
+Using the Manual Function Call
+You can also directly call the performScraping function to perform web scraping without using the class variant.
+
+```javascript
+// Set the URLs to be scraped
+const urls = ['https://example.com/page1', 'https://example.com/page2'];
+
+// Set the scrape callback function
+const scrapeCallback = ($) => {
+  // Perform scraping logic and return the scraped data
+};
+
+// Set the data handling callback function
+const dataHandlingCallback = (data) => {
+  // Perform data handling and return the processed data
+};
+
+// Set the concurrency (optional, default is 5)
+const concurrency = 10;
+
+// Set the onComplete callback function
+const onComplete = (data) => {
+  // Handle the scraped data after completion
+};
+
+// Execute the scraping process
+performScraping(urls, concurrency, scrapeCallback, dataHandlingCallback, onComplete)
+  .then(() => {
+    console.log('Scraping completed!');
+  })
+  .catch((error) => {
+    console.error('Error occurred during scraping:', error);
+  });
+```
+Custom Logger
+The library supports customizable logging using the CustomLogger class. You can create an instance of the CustomLogger class and pass it as an additional parameter to the performScraping function or set it in the Scraper class.
+
+```javascript
+import { performScraping, CustomLogger } from 'scraper-library';
+
+// Create a custom logger instance
+const logger = new CustomLogger();
+
+// Set the log level (optional, default is 'info')
+logger.setLogLevel('debug');
+
+// Set the logger instance in the Scraper class
+scraper.setLogger(logger);
+
+// Execute the scraping process with custom logging
+performScraping(urls, concurrency, scrapeCallback, dataHandlingCallback, onComplete, 'debug', logger);
+```
+## API Documentation
+### Scraper Class
+`constructor(concurrency?: number)`
+- Creates an instance of the Scraper class.
+- The concurrency parameter is optional and sets the maximum number of concurrent requests (default is 5).
+
+`setUrls(urls: string[]): void`
+- Sets the URLs to be scraped.
+- Accepts an array of URLs as the urls parameter.
+
+`setScrapeCallback(scrapeCallback: ScrapeCallback): void`
+- Sets the scrape callback function.
+- The scrapeCallback function is called for each URL to perform the scraping logic.
+
+`setDataHandlingCallback<T>(dataHandlingCallback: DataHandlingCallback<T>): void`
+- Sets the data handling callback function.
+- The dataHandlingCallback function is called to handle the scraped data and return the processed data.
+
+`setConcurrency(concurrency: number): void`
+- Sets the concurrency, which determines the maximum number of concurrent requests.
+
+`setOnComplete<T>(onComplete: OnComplete<T>): void`
+- Sets the onComplete callback function.
+- The onComplete function is called when the scraping process is completed.
+
+`setLogger(logger: CustomLogger): void`
+- Sets the logger instance for custom logging.
+
+`executeScraping(): Promise<void>`
+- Executes the web scraping process based on the configured settings.
+
+performScraping Function
+```javascript
+
+performScraping<T>(
+  urls: string[],
+  concurrency: number,
+  scrapeCallback: ScrapeCallback,
+  dataHandlingCallback: DataHandlingCallback<T>,
+  onComplete: OnComplete<T>,
+  logLevel?: 'debug' | 'info' | 'error',
+  logger?: CustomLogger
+): Promise<void>
+```
+- Executes the web scraping process with the provided parameters.
+- The urls parameter is an array of URLs to be scraped.
+- The concurrency parameter sets the maximum number of concurrent requests.
+- The scrapeCallback function is called for each URL to perform the scraping logic.
+- The dataHandlingCallback function is called to handle the scraped data and return the processed data.
+- The onComplete function is called when the scraping process is completed.
+- The logLevel parameter is optional and sets the log level for custom logging (default is 'info').
+- The logger parameter is optional and is used for custom logging with the CustomLogger class.
+
+## License
+MIT License
