@@ -71,7 +71,7 @@ const updateProgress = (completed: number, total: number, currentRequests: strin
   console.log(chalk.cyan('Data successfully saved for requests up to', chalk.green(completed)));
 };
 
-const executeScraping = (
+export const executeScraping = (
   urls: string[],
   scrapeCallback: ScrapeCallback,
   dataHandlingCallback: DataHandlingCallback,
