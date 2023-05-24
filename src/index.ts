@@ -81,7 +81,7 @@ const executeScraping = (
   onComplete: onComplete,
   concurrency = 5,
 ): void => {
-  let completed = 0;
+  const completed = 0;
   const collectedData: unknown[] = [];
   const allCollectedData: unknown[] = [];
   const currentRequests: string[] = [];
