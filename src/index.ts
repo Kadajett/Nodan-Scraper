@@ -6,6 +6,7 @@ import readline from 'readline';
 
 export type ScrapeCallback = (cheerio: CheerioAPI) => unknown;
 export type DataHandlingCallback = (data: unknown[]) => void;
+export type onComplete = (data: unknown[]) => void;
 
 const getScrapedData = async (url: string, total: number, scrapeCallback: ScrapeCallback): Promise<unknown> => {
   let completed = 0;
@@ -75,6 +76,7 @@ const executeScraping = (
   urls: string[],
   scrapeCallback: ScrapeCallback,
   dataHandlingCallback: DataHandlingCallback,
+  onComplete: onComplete,
   concurrency = 5,
 ): void => {
   const completed = 0;
@@ -102,6 +104,7 @@ const executeScraping = (
       console.log(chalk.green('All requests have been made'));
       if (collectedData.length > 0) {
         dataHandlingCallback(collectedData);
+        onComplete(collectedData);
       }
     });
 };
