@@ -53,6 +53,7 @@
     "axios": "^1.4.0",
     "bluebird": "^3.7.2",
     "chalk": "^5.2.0",
-    "cheerio": "^1.0.0-rc.12"
+    "cheerio": "^1.0.0-rc.12",
+    "module-alias": "^2.2.2"
   }
 }
