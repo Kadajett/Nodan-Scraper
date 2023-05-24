@@ -8,11 +8,14 @@ export type ScrapeCallback = (cheerio: CheerioAPI) => unknown;
 export type DataHandlingCallback = (data: unknown[]) => void;
 export type onComplete = (data: unknown[]) => void;
 
-const getScrapedData = async (url: string, total: number, scrapeCallback: ScrapeCallback): Promise<unknown> => {
-  let completed = 0;
-  const currentRequests: string[] = [];
-  const errors: Error[] = [];
-
+const getScrapedData = async (
+  url: string,
+  total: number,
+  completed: number,
+  currentRequests: string[],
+  errors: Error[],
+  scrapeCallback: ScrapeCallback,
+): Promise<unknown> => {
   currentRequests.push(url);
   updateProgress(completed, total, currentRequests, errors);
 
@@ -21,7 +24,6 @@ const getScrapedData = async (url: string, total: number, scrapeCallback: Scrape
     const $ = load(response.data);
 
     const data = scrapeCallback($);
-
     completed++;
     const requestIndex = currentRequests.indexOf(url);
     if (requestIndex > -1) {
@@ -75,13 +77,15 @@ const updateProgress = (completed: number, total: number, currentRequests: strin
 const executeScraping = (
   urls: string[],
   scrapeCallback: ScrapeCallback,
-  dataHandlingCallback: (data: unknown[]) => string, // dataHandlingCallback now returns a string
+  dataHandlingCallback: (data: unknown[]) => string,
   onComplete: onComplete,
   concurrency = 5,
 ): void => {
-  const completed = 0;
+  let completed = 0;
   const collectedData: unknown[] = [];
   const allCollectedData: unknown[] = [];
+  const currentRequests: string[] = [];
+  const errors: Error[] = [];
 
   const total = urls.length;
 
@@ -89,27 +93,20 @@ const executeScraping = (
     .map(
       urls,
       async (url, index) => {
-        const data = await getScrapedData(url, total, scrapeCallback);
+        const data = await getScrapedData(url, total, completed, currentRequests, errors, scrapeCallback);
         collectedData.push(data);
         allCollectedData.push(data);
 
         if (collectedData.length >= 5 || index === urls.length - 1) {
-          // Call the data handling callback
           const output = dataHandlingCallback(collectedData);
-
-          // Move the cursor to the dataHandlingCallback line
           readline.cursorTo(process.stdout, 0, 10);
           readline.clearLine(process.stdout, 0);
-
-          // Print the output of the callback
           console.log(output);
 
           collectedData.length = 0;
         }
       },
-      {
-        concurrency: concurrency,
-      },
+      { concurrency },
     )
     .finally(() => {
       console.log(chalk.green('All requests have been made'));
