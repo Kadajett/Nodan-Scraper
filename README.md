@@ -22,27 +22,47 @@ Basic Usage
 Here's a basic example of how to use Nodan Scraper.
 
 ```js
-import executeScraping from 'nodan-scraper';
-import fs from 'fs';
+import fs from "fs";
+import { executeScraping } from "nodan-scraper";
 
-// Define the scraping function
-const scrapeCallback = ($) => {
-  // Scrape data using Cheerio ($)
-};
+const output = [];
 
-// Define the data handling function
-const dataHandlingCallback = (data) => {
-  fs.writeFile('output.json', JSON.stringify(data, null, 2), (err) => {
-    if (err) throw err;
-    console.log('Data saved to output.json');
-  });
-};
+executeScraping(
+  [
+    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=Champion%20of%20Anarchy",
+    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=Champion%20of%20Balance",
+    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=Champion%20of%20Freedom",
+    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=Champion%20of%20Destruction",
+    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=Champion%20of%20Grace",
+    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=Champion%20of%20Malevolence",
+    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=Champion%20of%20Righteousness",
+    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=Champion%20of%20Tranquility",
+    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=Champion%20of%20Tyranny",
+    "https://www.aonprd.com/FeatDisplay.aspx?ItemName=All%20Gnolls%20Must%20Die",
+  ],
+  ($) => {
+    const links = [];
+    $("a").each((i, link) => {
+      const href = $(link).attr("href");
+      if (href && href !== "javascript:void(0);") {
+        links.push(href);
+      }
+    });
+    return links;
+  },
+  (data) => {
+    // Flatten the arrays and then print the length
+    const flattenedData = [].concat(...data);
 
-// List of URLs to scrape
-const urls = ['http://example.com/page1', 'http://example.com/page2'];
+    return flattenedData;
+  },
+  (data) => {
+    // flatten and then remove duplicates
+    const flattenedData = [].concat(...data);
+    fs.writeFileSync("output.json", JSON.stringify(flattenedData, null, 2));
+  }
+);
 
-// Execute scraping
-executeScraping(urls, scrapeCallback, dataHandlingCallback);
 ```
 API
 executeScraping(urls, scrapeCallback, dataHandlingCallback, [concurrency])
