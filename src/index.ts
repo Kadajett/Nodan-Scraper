@@ -4,8 +4,8 @@ import chalk from 'chalk';
 import { CheerioAPI, load } from 'cheerio';
 import readline from 'readline';
 
-type ScrapeCallback = (cheerio: CheerioAPI) => unknown;
-type DataHandlingCallback = (data: unknown[]) => void;
+export type ScrapeCallback = (cheerio: CheerioAPI) => unknown;
+export type DataHandlingCallback = (data: unknown[]) => void;
 
 const getScrapedData = async (url: string, total: number, scrapeCallback: ScrapeCallback): Promise<unknown> => {
   let completed = 0;
@@ -71,7 +71,7 @@ const updateProgress = (completed: number, total: number, currentRequests: strin
   console.log(chalk.cyan('Data successfully saved for requests up to', chalk.green(completed)));
 };
 
-export const executeScraping = (
+const executeScraping = (
   urls: string[],
   scrapeCallback: ScrapeCallback,
   dataHandlingCallback: DataHandlingCallback,
@@ -105,5 +105,7 @@ export const executeScraping = (
       }
     });
 };
+
+export { executeScraping };
 
 export default executeScraping;
