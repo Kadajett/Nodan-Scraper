@@ -1,6 +1,6 @@
 {
   "name": "nodan-scraper",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "type": "module",
   "description": "Nodejs scraper for the modern web",
   "main": "lib/index.js",

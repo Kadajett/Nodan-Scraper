@@ -75,13 +75,13 @@ const updateProgress = (completed: number, total: number, currentRequests: strin
 const executeScraping = (
   urls: string[],
   scrapeCallback: ScrapeCallback,
-  dataHandlingCallback: DataHandlingCallback,
+  dataHandlingCallback: (data: unknown[]) => string, // dataHandlingCallback now returns a string
   onComplete: onComplete,
   concurrency = 5,
 ): void => {
   const completed = 0;
   const collectedData: unknown[] = [];
-  const allCollectedData: unknown[] = []; // <-- Add this line to store all scraped data
+  const allCollectedData: unknown[] = [];
 
   const total = urls.length;
 
@@ -91,10 +91,19 @@ const executeScraping = (
       async (url, index) => {
         const data = await getScrapedData(url, total, scrapeCallback);
         collectedData.push(data);
-        allCollectedData.push(data); // <-- Add this line to collect the data into the allCollectedData array
+        allCollectedData.push(data);
 
         if (collectedData.length >= 5 || index === urls.length - 1) {
-          dataHandlingCallback(collectedData);
+          // Call the data handling callback
+          const output = dataHandlingCallback(collectedData);
+
+          // Move the cursor to the dataHandlingCallback line
+          readline.cursorTo(process.stdout, 0, 10);
+          readline.clearLine(process.stdout, 0);
+
+          // Print the output of the callback
+          console.log(output);
+
           collectedData.length = 0;
         }
       },
@@ -105,9 +114,12 @@ const executeScraping = (
     .finally(() => {
       console.log(chalk.green('All requests have been made'));
       if (collectedData.length > 0) {
-        dataHandlingCallback(collectedData);
+        const output = dataHandlingCallback(collectedData);
+        readline.cursorTo(process.stdout, 0, 10);
+        readline.clearLine(process.stdout, 0);
+        console.log(output);
       }
-      onComplete(allCollectedData); // <-- Pass allCollectedData to the onComplete callback
+      onComplete(allCollectedData);
     });
 };
 
